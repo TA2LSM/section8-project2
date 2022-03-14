@@ -36,7 +36,11 @@ router.post("/", async (req, res) => {
   const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let customer = new Customer({ name: req.body.name, phone: req.body.phone });
+  let customer = new Customer({
+    name: req.body.name,
+    phone: req.body.phone,
+    isGold: req.body.isGold,
+  });
   customer = await customer.save(); //result db'e kaydedilen dökümandır. id bilgisini geri dönelim...
 
   res.status(200).send(customer);
@@ -49,7 +53,7 @@ router.put("/:id", async (req, res) => {
 
   const customer = await Customer.findByIdAndUpdate(
     req.params.id,
-    { name: req.body.name, phone: req.body.phone },
+    { name: req.body.name, phone: req.body.phone, isGold: req.body.isGold },
     { new: true } //update edilmiş veriyi geri döndür...
   );
 
@@ -77,6 +81,7 @@ function validateCustomer(customer) {
   const schema = {
     name: Joi.string().min(3).required(),
     phone: Joi.string().min(11).max(13).required(),
+    isGold: Joi.boolean(),
   };
 
   return Joi.validate(customer, schema);
